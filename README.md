@@ -1,18 +1,19 @@
-# shrink-ray
+# compress-it
 
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
 
 Node.js compression middleware with modern codings like brotli and zopfli.
+No native bindings.
 
 The following compression codings are supported:
 
-  - deflate
-  - gzip
-  - brotli
-  - zopfli (for asynchronous compression of static assets only)
+* deflate
+* gzip
+* brotli
+* zopfli (for asynchronous compression of static assets only)
 
-In addition, if a response contains an ETag, `shrink-ray` will cache the compressed
+In addition, if a response contains an ETag, `compress-it` will cache the compressed
 result for later requests and even re-compress it asynchronously at the highest
 possible compression (using zopfli for gzip and deflate and brotli quality 11
 for brotli). This makes it possible to use the best possible compression
@@ -20,12 +21,12 @@ algorithms for static content (saving as much as 25% over standard gzip) without
 sacrificing runtime performance.
 
 The combination of caching and use of better compression algorithms makes
-`shrink-ray` serve static files in [our benchmark](./benchmark) 3x faster than
+`compress-it` serve static files in [our benchmark](./benchmark) 3x faster than
 `compression` while using only one quarter as much CPU time.
 
-**Note:** this project was forked from `compression`, the standard Express/Connect
-compression middleware, and it stands on the shoulders of that impressive
-project.
+**Note:** this project was forked from `shrink-ray` which based upon `compression`, the standard Express/Connect
+compression middleware, and it stands on the shoulders of both impressive
+projects.
 
 ## Install
 
@@ -33,18 +34,18 @@ You must first install `node`, `npm`, and [the node native build
 toolchain](https://github.com/nodejs/node-gyp#installation).
 
 ```bash
-$ npm install shrink-ray
+$ npm install compress-it
 ```
 
 ## API
 
 ```js
-var shrinkRay = require('shrink-ray')
+var compressIt = require("compress-it");
 ```
 
-### shrinkRay([options])
+### compressIt([options])
 
-Returns the shrink-ray middleware using the given `options`. The middleware
+Returns the compress-it middleware using the given `options`. The middleware
 will attempt to compress response bodies for all request that traverse through
 the middleware, based on the given `options`.
 
@@ -54,12 +55,12 @@ as compressing will transform the body.
 
 #### Options
 
-`shrinkRay()` accepts these properties in the options object.
+`compressIt()` accepts these properties in the options object.
 
-Note that `shrink-ray` options are backward-compatible with `compression`, but
+Note that `compress-it` options are backward-compatible with `compression`, but
 we have also moved all of the gzip/deflate/zlib-specific parameters
 into a sub-object called `zlib`. If you use `zlib` parameters at the root level
-of options in `shrink-ray`, you will get a deprecation warning.
+of options in `compress-it`, you will get a deprecation warning.
 
 ##### filter
 
@@ -76,7 +77,7 @@ module to determine if `res.getHeader('Content-Type')` is compressible.
 A function to decide if the compressed response should be cached for later use.
 This function is called as `cache(req, res)` and is expected to return `true` if
 the compressed response should be cached and `false` if the response should not
-be cached. Note that `shrink-ray` uses ETags to ensure that a cache entry is appropriate
+be cached. Note that `compress-it` uses ETags to ensure that a cache entry is appropriate
 to return, so it will **never** cache a response that does not include an `ETag`,
 even if the cache function returns `true`.
 
@@ -87,7 +88,7 @@ not acceptable for use when responding to a request in real-time because they
 are too CPU-intensive, but they can be performed in the background so that
 subsequent requests get the highest compression levels available.
 
-By default, `shrink-ray` caches any response that has an `ETag` header associated with
+By default, `compress-it` caches any response that has an `ETag` header associated with
 it, which means it should work out of the box with `express.static`, caching static
 files with the highest available compression. If you serve a large number of dynamic
 files with ETags, you may want to have your cache function restrict caching to your
@@ -150,17 +151,17 @@ compression). The special value `-1` can be used to mean the "default
 compression level", which is a default compromise between speed and
 compression (currently equivalent to level 6).
 
-  - `-1` Default compression level (also `zlib.Z_DEFAULT_COMPRESSION`).
-  - `0` No compression (also `zlib.Z_NO_COMPRESSION`).
-  - `1` Fastest compression (also `zlib.Z_BEST_SPEED`).
-  - `2`
-  - `3`
-  - `4`
-  - `5`
-  - `6` (currently what `zlib.Z_DEFAULT_COMPRESSION` points to).
-  - `7`
-  - `8`
-  - `9` Best compression (also `zlib.Z_BEST_COMPRESSION`).
+* `-1` Default compression level (also `zlib.Z_DEFAULT_COMPRESSION`).
+* `0` No compression (also `zlib.Z_NO_COMPRESSION`).
+* `1` Fastest compression (also `zlib.Z_BEST_SPEED`).
+* `2`
+* `3`
+* `4`
+* `5`
+* `6` (currently what `zlib.Z_DEFAULT_COMPRESSION` points to).
+* `7`
+* `8`
+* `9` Best compression (also `zlib.Z_BEST_COMPRESSION`).
 
 The default value is `zlib.Z_DEFAULT_COMPRESSION`, or `-1`.
 
@@ -183,19 +184,19 @@ This is used to tune the compression algorithm. This value only affects the
 compression ratio, not the correctness of the compressed output, even if it
 is not set appropriately.
 
-  - `zlib.Z_DEFAULT_STRATEGY` Use for normal data.
-  - `zlib.Z_FILTERED` Use for data produced by a filter (or predictor).
-    Filtered data consists mostly of small values with a somewhat random
-    distribution. In this case, the compression algorithm is tuned to
-    compress them better. The effect is to force more Huffman coding and less
-    string matching; it is somewhat intermediate between `zlib.Z_DEFAULT_STRATEGY`
-    and `zlib.Z_HUFFMAN_ONLY`.
-  - `zlib.Z_FIXED` Use to prevent the use of dynamic Huffman codes, allowing
-    for a simpler decoder for special applications.
-  - `zlib.Z_HUFFMAN_ONLY` Use to force Huffman encoding only (no string match).
-  - `zlib.Z_RLE` Use to limit match distances to one (run-length encoding).
-    This is designed to be almost as fast as `zlib.Z_HUFFMAN_ONLY`, but give
-    better compression for PNG image data.
+* `zlib.Z_DEFAULT_STRATEGY` Use for normal data.
+* `zlib.Z_FILTERED` Use for data produced by a filter (or predictor).
+  Filtered data consists mostly of small values with a somewhat random
+  distribution. In this case, the compression algorithm is tuned to
+  compress them better. The effect is to force more Huffman coding and less
+  string matching; it is somewhat intermediate between `zlib.Z_DEFAULT_STRATEGY`
+  and `zlib.Z_HUFFMAN_ONLY`.
+* `zlib.Z_FIXED` Use to prevent the use of dynamic Huffman codes, allowing
+  for a simpler decoder for special applications.
+* `zlib.Z_HUFFMAN_ONLY` Use to force Huffman encoding only (no string match).
+* `zlib.Z_RLE` Use to limit match distances to one (run-length encoding).
+  This is designed to be almost as fast as `zlib.Z_HUFFMAN_ONLY`, but give
+  better compression for PNG image data.
 
 **Note** in the list above, `zlib` is from `zlib = require('zlib')`.
 
@@ -222,16 +223,16 @@ The default `filter` function. This is used to construct a custom filter
 function that is an extension of the default function.
 
 ```js
-app.use(shrinkRay({filter: shouldCompress}))
+app.use(compressIt({ filter: shouldCompress }));
 
 function shouldCompress(req, res) {
-  if (req.headers['x-no-compression']) {
+  if (req.headers["x-no-compression"]) {
     // don't compress responses with this request header
-    return false
+    return false;
   }
 
   // fallback to standard filter function
-  return shrinkRay.filter(req, res)
+  return compressIt.filter(req, res);
 }
 ```
 
@@ -251,13 +252,13 @@ When using this module with express or connect, simply `app.use` the module as
 high as you like. Requests that pass through the middleware will be compressed.
 
 ```js
-var shrinkRay = require('shrink-ray')
-var express = require('express')
+var compressIt = require("compress-it");
+var express = require("express");
 
-var app = express()
+var app = express();
 
 // compress all requests
-app.use(shrinkRay())
+app.use(compressIt());
 
 // add all routes
 ```
@@ -276,38 +277,38 @@ actually make it to the client.
 compression for server-sent events.)
 
 ```js
-var shrinkRay = require('shrink-ray')
-var express     = require('express')
+var compressIt = require("compress-it");
+var express = require("express");
 
-var app = express()
+var app = express();
 
 // compress responses
-app.use(shrinkRay())
+app.use(compressIt());
 
 // server-sent event stream
-app.get('/events', function (req, res) {
-  res.setHeader('Content-Type', 'text/event-stream')
-  res.setHeader('Cache-Control', 'no-cache')
+app.get("/events", function(req, res) {
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
 
   // send a ping approx every 2 seconds
-  var timer = setInterval(function () {
-    res.write('data: ping\n\n')
+  var timer = setInterval(function() {
+    res.write("data: ping\n\n");
 
     // !!! this is the important part
-    res.flush()
-  }, 2000)
+    res.flush();
+  }, 2000);
 
-  res.on('close', function () {
-    clearInterval(timer)
-  })
-})
+  res.on("close", function() {
+    clearInterval(timer);
+  });
+});
 ```
 
 ## License
 
 [MIT](LICENSE)
 
-[npm-image]: https://img.shields.io/npm/v/shrink-ray.svg
-[npm-url]: https://npmjs.org/package/shrink-ray
-[downloads-image]: https://img.shields.io/npm/dm/shrink-ray.svg
-[downloads-url]: https://npmjs.org/package/shrink-ray
+[npm-image]: https://img.shields.io/npm/v/compress-it.svg
+[npm-url]: https://npmjs.org/package/compress-it
+[downloads-image]: https://img.shields.io/npm/dm/compress-it.svg
+[downloads-url]: https://npmjs.org/package/compress-it

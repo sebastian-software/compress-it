@@ -1,14 +1,15 @@
 {
-  "name": "shrink-ray",
+  "name": "compress-it",
   "description": "Node.js compression middleware with brotli and zopfli support",
-  "version": "0.1.4",
+  "version": "0.1.0",
   "contributors": [
     "Douglas Christopher Wilson <doug@somethingdoug.com>",
     "Jonathan Ong <me@jongleberry.com> (http://jongleberry.com)",
-    "Sasha Aickin"
+    "Sasha Aickin",
+    "Sebastian Fastner <s.fastner@sebastian-software.de>"
   ],
   "license": "MIT",
-  "repository": "aickin/compression",
+  "repository": "sebastian-software/compress-it",
   "keywords": [
     "compression",
     "gzip",
@@ -44,11 +45,7 @@
     "mocha": "3.2.0",
     "supertest": "3.0.0"
   },
-  "files": [
-    "LICENSE",
-    "HISTORY.md",
-    "index.js"
-  ],
+  "files": ["LICENSE", "HISTORY.md", "index.js"],
   "engines": {
     "node": ">= 4.2.0"
   },

@@ -1,7 +1,7 @@
 {
   "name": "benchmark",
   "version": "0.0.1",
-  "description": "Benchmark for shrink-ray",
+  "description": "Benchmark for compress-it",
   "main": "index.js",
   "scripts": {
     "siege": "siege -t 1m -H \"Accept-Encoding: gzip\" -c 100 -i -f urls.txt",
@@ -12,7 +12,7 @@
   "dependencies": {
     "compression": "^1.6.1",
     "express": "^4.13.4",
-    "shrink-ray": "file:..",
+    "compress-it": "file:..",
     "yargs": "^4.1.0"
   }
 }
